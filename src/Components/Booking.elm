@@ -2,30 +2,37 @@ module Components.Booking exposing (..)
 
 
 import Html.Styled exposing (Html, div, text, form, label, input, button)
-import Html.Styled.Attributes exposing (class, type_, id, value)
+import Html.Styled.Attributes as Attributes exposing (class, type_, id, value)
 import Html.Styled.Events exposing (onInput, onClick)
 import Misc.View exposing (StyledView)
 import Api.ApartmentData exposing (Apartment)
 import Misc.Http exposing (Data(..), HttpError)
 import Api.BookingData exposing (Booking, BookingResp)
-import Date exposing (toIsoString)
+import Date exposing (toIsoString, Date)
 
 type Msg
-    = Fname String
-    | Lname String
-    | Email String
-    | StartDate String
-    | EndDate String
-    | Book
+    = Book
     | BookingApiResponded (Result HttpError BookingResp)
+    | UpdateForm FormField String
+    | ApartmentApiResponded (Result HttpError Apartment)
+    | GetToday Date
+
+type FormField
+    = Fname
+    | Lname
+    | Email
+    | StartDate
+    | EndDate
 
 view :
     { title : String
     , apartment : Data Apartment
+    , today : Date
     , booking : Booking
     , body : List (Html Msg) 
     }
     -> StyledView Msg
+
 view props =
     { title = "Booking for " ++ (getApartmentName props.title props.apartment)
     , body =
@@ -40,31 +47,31 @@ view props =
                                         [ div [class "form-group"]
                                             [ label [ class "text-black"]
                                                 [ text "First Name" ]
-                                            , input [type_ "text", class "form-control", id "fname", value props.booking.fname, onInput Fname] []
+                                            , input [type_ "text", class "form-control", id "fname", value props.booking.fname, onInput (UpdateForm Fname) ] []
                                             ]
                                         ]
                                     , div [class "col-6"]
                                         [ div [class "form-group"]
                                             [ label [ class "text-black"]
                                                 [ text "Last Name" ]
-                                            , input [type_ "text", class "form-control", id "lname", value props.booking.lname, onInput Lname] []
+                                            , input [type_ "text", class "form-control", id "lname", value props.booking.lname, onInput (UpdateForm Lname)] []
                                             ]
                                         ]
                                     ]
                                 , div [class "form-group"]
                                     [ label [ class "text-black"]
                                         [ text "Email" ] 
-                                    , input [type_ "email", class "form-control", id "email", value props.booking.email, onInput Email] []
+                                    , input [type_ "email", class "form-control", id "email", value props.booking.email, onInput (UpdateForm Email)] []
                                     ]
                                 , div [class "form-group"]
                                     [ label [ class "text-black"]
-                                        [ text "Email" ] 
-                                    , input [type_ "date", class "form-control", id "email", value <| toIsoString props.booking.startDate, onInput StartDate ] []
+                                        [ text "Start Date" ] 
+                                    , input [type_ "date", class "form-control", id "email", value <| toIsoString props.booking.range.start_date, onInput (UpdateForm StartDate), Attributes.min <| toIsoString props.today] []
                                     ]
                                 , div [class "form-group mb-5"]
                                     [ label [ class "text-black"]
-                                        [ text "Email" ] 
-                                    , input [type_ "date", class "form-control", id "email", value <| toIsoString props.booking.endDate, onInput EndDate] []
+                                        [ text "End Date" ] 
+                                    , input [type_ "date", class "form-control", id "email", value <| toIsoString props.booking.range.end_date, onInput (UpdateForm EndDate), Attributes.min <| toIsoString props.booking.range.start_date] []
                                     ]
                                 , button [type_ "button", class "btn btn-primary-hover-outline", onClick Book] [ text "Confirm Booking" ]
                                 ]

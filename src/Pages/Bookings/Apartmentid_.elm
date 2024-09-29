@@ -6,13 +6,15 @@ import View as V
 import Page exposing (Page)
 import Components.Header
 import Components.Hero
-import Components.Booking exposing (Msg(..))
+import Components.Booking exposing (Msg(..), FormField(..))
 import Misc.View exposing (toUnstyledView)
 import Misc.Http exposing (Data(..))
 import Api.BookingData exposing (createBooking, Booking)
 import Api.ApartmentData exposing (Apartment)
 import Time exposing (Month(..))
 import Date
+import Api.ApartmentData exposing (getApartment)
+import Task
 
 type alias Msg = Components.Booking.Msg
 
@@ -30,9 +32,9 @@ page params =
 
 
 type alias Model =
-    {
-        booking : Booking
-        , apartment : Data Apartment
+    { booking : Booking
+    , apartment : Data Apartment
+    , today : Date.Date
     }
 
 
@@ -40,54 +42,58 @@ init : String -> (Model, Cmd Msg)
 init apartmentid =
     ({
       apartment = Loading
-    , booking = {
-        fname = ""
-        , lname = ""
-        , email = ""
-        , id = apartmentid
-        , startDate = (Date.fromCalendarDate 1970 Jan 1)
-        , endDate = (Date.fromCalendarDate 1970 Jan 1)
+    , booking = defaultBooking apartmentid (Date.fromCalendarDate 1970 Jan 1)
+    , today = Date.fromCalendarDate 1970 Jan 1
     }
-    }
-    ,Cmd.none)
+    ,  Cmd.batch 
+        [ getApartment apartmentid
+            { onResponse = ApartmentApiResponded
+            }
+        , Date.today |> Task.perform GetToday
+    ])
 
 
+defaultBooking : String -> Date.Date -> Booking
+defaultBooking apartmentid defaultDate = 
+    { fname = ""
+    , lname = ""
+    , email = ""
+    , apartment_id = apartmentid
+    , range = 
+        { start_date = defaultDate
+        , end_date = defaultDate
+        }
+    }
 
 -- UPDATE
-updateLname : String -> Model -> Model
-updateLname input ({ booking } as model) =
-    { model 
-    | booking = { booking | lname = input }
-    }
-updateFname : String -> Model -> Model
-updateFname input ({ booking } as model) =
-    { model 
-    | booking = { booking | fname = input }
-    }
-updateEmail : String -> Model -> Model
-updateEmail input ({ booking } as model) =
-    { model 
-    | booking = { booking | email = input }
-    }
-updateStartdate : String -> Model -> Model
-updateStartdate input ({ booking } as model) =
-    { model 
-    | booking = { booking | startDate = Maybe.withDefault (Date.fromCalendarDate 1970 Jan 1) (Result.toMaybe (Date.fromIsoString input)) }
-    }
-updateEnddate : String -> Model -> Model
-updateEnddate input ({ booking } as model) =
-    { model 
-    | booking = { booking | endDate = Maybe.withDefault (Date.fromCalendarDate 1970 Jan 1) (Result.toMaybe (Date.fromIsoString input)) }
-    }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        Fname input -> (updateFname input model, Cmd.none)
-        Lname input -> (updateLname input model, Cmd.none)
-        Email input -> (updateEmail input model, Cmd.none)
-        StartDate input -> (updateStartdate input model, Cmd.none)
-        EndDate input -> (updateEnddate input model, Cmd.none)
+        UpdateForm field input ->
+            let
+                booking = model.booking
+                range = booking.range
+            in
+                case field of
+                    Fname ->
+                        ({ model | booking = { booking | fname = input } }, Cmd.none)
+                    Lname ->
+                        ({ model | booking = { booking | lname = input } }, Cmd.none)
+                    Email ->
+                        ({ model | booking = { booking | email = input } }, Cmd.none)
+                    StartDate ->
+                        let
+                            start_date = Maybe.withDefault model.booking.range.start_date (Result.toMaybe (Date.fromIsoString input))
+                            end_date = Date.max start_date model.booking.range.end_date
+                        in
+                            ({ model | booking = { booking | range = { range | start_date = start_date, end_date = end_date } } }, Cmd.none)
+                    EndDate ->
+                        let
+                            end_date = Maybe.withDefault model.booking.range.end_date (Result.toMaybe (Date.fromIsoString input))
+                            start_date = Date.min end_date model.booking.range.start_date
+                        in
+                            ({ model | booking = { booking | range = { range | start_date = start_date, end_date = end_date } } }, Cmd.none)
         Book ->
             (model
             , createBooking {
@@ -95,13 +101,29 @@ update msg model =
                 ,  booking = model.booking
             })
         BookingApiResponded (Ok _) ->
-            ( model
-            , Cmd.none
+            ( { model | booking = defaultBooking model.booking.apartment_id model.booking.range.start_date }
+            , Date.today |> Task.perform GetToday
             )
         BookingApiResponded (Err _) ->
             ( model
             , Cmd.none
             )
+        ApartmentApiResponded (Ok data) ->
+            ( { model | apartment = Success data }
+            , Cmd.none
+            )
+        ApartmentApiResponded (Err _) ->
+            ( model
+            , Cmd.none
+            )
+        GetToday today ->
+            let
+                booking = model.booking
+                range = booking.range
+            in
+                ( { model | today = today, booking = { booking | range = { range | start_date = today, end_date = today } } }
+                , Cmd.none
+                )
             
 
 -- SUBSCRIPTIONS
@@ -119,9 +141,17 @@ view params model =
     toUnstyledView <|
     Components.Header.view <|
         Components.Hero.view <|
-            Components.Booking.view
-                { title = "Home"
-                , apartment = model.apartment
-                , booking = model.booking
-                , body = [ text("User ID " ++ params.apartmentid)]
+            let
+                innerView =
+                    Components.Booking.view
+                        { title = "Booking"
+                        , apartment = model.apartment
+                        , booking = model.booking
+                        , today = model.today
+                        , body = []
+                        }
+            in
+                { title = innerView.title
+                , apartment = Just params.apartmentid
+                , body = innerView.body
                 }

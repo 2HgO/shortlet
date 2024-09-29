@@ -17,16 +17,19 @@ createBooking options =
         body : Encode.Value
         body =
             Encode.object
-                [ ("startDate", Encode.string <| toIsoString options.booking.startDate)
-                , ("endDate", Encode.string <| toIsoString options.booking.endDate)
-                , ("fname", Encode.string options.booking.fname)
+                [ ("fname", Encode.string options.booking.fname)
+                , ("apartment_id", Encode.string options.booking.apartment_id)
                 , ("lname", Encode.string options.booking.lname)
                 , ("email", Encode.string options.booking.email)
+                , ("range", Encode.object 
+                    [ ("start_date", Encode.string <| toIsoString options.booking.range.start_date)
+                    , ("end_date", Encode.string <| toIsoString options.booking.range.end_date)
+                    ])
                 ]
         cmd : Cmd msg
         cmd =
             Http.post
-                { url = "http://localhost:55056/api/bookings/" ++ options.booking.id
+                { url = "http://localhost:55059/api/bookings"
                 , body = Http.jsonBody body
                 , expect = expectJson options.onResponse bookingRespDecoder
                 }
@@ -40,12 +43,16 @@ type alias BookingResp =
     }
 
 type alias Booking =
-    { id : String
+    { apartment_id : String
     , fname : String
     , lname : String
     , email : String
-    , startDate : Date
-    , endDate : Date
+    , range : DateRange
+    }
+
+type alias DateRange =
+    { start_date : Date
+    , end_date : Date
     }
 
 bookingRespDecoder : Decoder BookingResp

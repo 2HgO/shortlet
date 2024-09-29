@@ -28,29 +28,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { apartments = Success [
-        { id = "id"
-        , isAvailable = True
-        , name = "name"
-        , address = "address"
-        , images = ["/img/bella-loft-08.jpg"]
-        , rate = 45.05
-        }
-        , { id = "id"
-        , isAvailable = True
-        , name = "name"
-        , address = "address"
-        , images = ["/img/bella-loft-08.jpg"]
-        , rate = 45.05
-        }
-        , { id = "id"
-        , isAvailable = True
-        , name = "name"
-        , address = "address"
-        , images = ["/img/bella-loft-08.jpg"]
-        , rate = 45.05
-        }
-    ] }
+    ( { apartments = Loading }
     , listApartments
         { onResponse = ApartmentApiResponded
         }
@@ -92,8 +70,15 @@ view model =
     toUnstyledView <|
     Components.Header.view <|
         Components.Hero.view <|
-            Components.Listing.view <|
-                { title = "Home"
-                , apartments = model.apartments
-                , body = []
+            let
+                innerView =
+                    Components.Listing.view <|
+                        { title = "Home"
+                        , apartments = model.apartments
+                        , body = []
+                        }
+            in
+                { title = innerView.title
+                , apartment = Nothing
+                , body = innerView.body
                 }

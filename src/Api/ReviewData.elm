@@ -13,7 +13,7 @@ listReviews : String
     -> Cmd msg
 listReviews apartmentID options =
     Http.get
-        { url = "http://localhost:55056/api/reviews?apartmentID=" ++ apartmentID
+        { url = "http://localhost:55059/api/reviews?apartmentID=" ++ apartmentID
         , expect = expectJson options.onResponse reviewListDecoder
         }
 

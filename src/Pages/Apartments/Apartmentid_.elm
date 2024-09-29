@@ -32,20 +32,11 @@ type alias Model =
 
 init : String -> (Model, Cmd Msg)
 init apartmentid =
-    ({ apartment = Success { id = "id"
-        , isAvailable = True
-        , name = "Bella Loft"
-        , address = "address"
-        , images = ["/img/bella-loft-01.jpg", "/img/bella-loft-03.jpg", "/img/bella-loft-04.jpg", "/img/bella-loft-05.jpg", "/img/bella-loft-07.jpg", "/img/bella-loft-08.jpg", "/img/bella-loft-09.jpg", "/img/bella-loft-10.jpg"]
-        , rate = 45.05
-        }
-    }
+    ({ apartment = Loading }
     , getApartment apartmentid
         { onResponse = ApartmentApiResponded
         }
     )
-
-
 
 -- UPDATE
 
@@ -79,10 +70,17 @@ subscriptions _ =
 view : { apartmentid : String } -> Model -> V.View Msg
 view params model =
     toUnstyledView <|
-    Components.Header.view <|
-        Components.Hero.view <|
-            Components.Apartment.view
-                { title = "Home"
-                , apartment = model.apartment
-                , body = [ text("Apartment ID " ++ params.apartmentid)]
-                }
+        Components.Header.view <|
+            Components.Hero.view <|
+                let
+                    innerView = 
+                        Components.Apartment.view
+                            { title = "Home"
+                            , apartment = model.apartment
+                            , body = []
+                            }
+                in
+                    { title = innerView.title
+                    , apartment = Just params.apartmentid
+                    , body = innerView.body
+                    }

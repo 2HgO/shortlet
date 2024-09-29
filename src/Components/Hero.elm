@@ -6,6 +6,7 @@ import Misc.View exposing (StyledView)
 
 view :
     { title : String
+    , apartment : Maybe String
     , body : List (Html msg) 
     }
     -> StyledView msg
@@ -19,7 +20,7 @@ view props =
                     [ div [ class "intro-excerpt" ]
                         [ h1 [] [ br[][], span [ class "d-block" ] [ text (if List.member props.title ["Home", "Booking", "Contact"] then "Lekki Shortlets " else props.title) ] ]
                         , p [ class "mb-4" ] [ text "Shortlets available for rent" ]
-                        , p [] [ a [ href "#booking_form", class "btn btn-secondary me-2" ] [ text "Book Now" ] ]
+                        , p [] [ a [ href <| getButtonHref props.apartment, class "btn btn-secondary me-2" ] [ text "Book Now" ] ]
                         ]
                     ]
                 , div [ class "col-lg-7" ]
@@ -31,3 +32,11 @@ view props =
         ] :: props.body
     }
     
+
+getButtonHref : Maybe String -> String
+getButtonHref val =
+    case val of
+        Just apartmentid ->
+            "/bookings/" ++ apartmentid
+        Nothing ->
+            "/bookings"

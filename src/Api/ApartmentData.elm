@@ -11,7 +11,7 @@ getApartment : String
     -> Cmd msg
 getApartment apartmentID options =
     Http.get
-        { url = "http://localhost:55056/api/apartments/" ++ apartmentID
+        { url = "http://localhost:55059/api/apartments/" ++ apartmentID
         , expect = expectJson options.onResponse apartmentDecoder
         }
 
@@ -21,13 +21,12 @@ listApartments :
     -> Cmd msg
 listApartments options =
     Http.get
-        { url = "http://localhost:55056/api/apartments"
+        { url = "http://localhost:55059/api/apartments"
         , expect = expectJson options.onResponse apartmentListDecoder
         }
 
 type alias Apartment =
     { id : String
-    , isAvailable : Bool
     , name : String
     , address : String
     , images : List String
@@ -37,14 +36,12 @@ type alias Apartment =
 apartmentDecoder : Decoder Apartment
 apartmentDecoder =
     Field.require "id" Decode.string <| \id ->
-    Field.require "isAvailable" Decode.bool <| \isAvailable ->
     Field.require "name" Decode.string <| \name ->
     Field.require "address" Decode.string <| \address ->
     Field.require "images" (Decode.list Decode.string) <| \images ->
     Field.require "rate" Decode.float <| \rate ->
     Decode.succeed
         { id = id
-        , isAvailable = isAvailable
         , name = name
         , address = address
         , images = images
