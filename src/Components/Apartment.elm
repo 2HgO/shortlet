@@ -5,6 +5,8 @@ import Html.Styled.Attributes exposing (class, href, src, attribute)
 import Misc.View exposing (StyledView)
 import Api.ApartmentData exposing (Apartment)
 import Misc.Http exposing (Data(..))
+import FormatNumber exposing (format)
+import FormatNumber.Locales exposing (usLocale)
 
 view :
     { title : String
@@ -50,8 +52,7 @@ viewApartment data =
                 div [ class "row justify-content-center" ]
                     [ div [ class "col-md-8 col-lg-8 pb-4" ]
                         [ div [ class "row mb-5" ]
-                            [ label "/img/location.svg" apartment.address
-                            , label "/img/rate.svg" (String.fromFloat apartment.rate)
+                            [ label "/img/rate.svg" ("₦" ++ format usLocale apartment.rate)
                             ]
                         ]
                     ]

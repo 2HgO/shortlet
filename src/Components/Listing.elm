@@ -1,10 +1,14 @@
 module Components.Listing exposing (..)
 
-import Html.Styled exposing (Html, div, h2, text, p, a, h3, img, strong, span)
+import Html.Styled exposing (Html, div, h2, text, p, a, h3, img)
 import Html.Styled.Attributes exposing (class, href, src)
 import Misc.View exposing (StyledView)
 import Api.ApartmentData exposing (Apartment)
 import Misc.Http exposing (Data(..))
+import Css exposing (paddingBottom)
+import Css exposing (px)
+import Css exposing (important)
+import Html.Styled.Attributes exposing (css)
 
 view :
     { title : String
@@ -15,7 +19,7 @@ view :
 view props =
     { title = props.title
     , body =
-        div [ class "product-section" ]
+        div [ class "product-section", css [ important <| paddingBottom (px 10) ] ]
             [ div [ class "container" ]
                 [ div [ class "row" ] <|
                     div [ class "col-md-12 col-lg-3 mb-5 mb-lg-0" ]
@@ -45,7 +49,5 @@ viewApartment apartment =
         [ a [ class "product-item", href ("/apartments/" ++ apartment.id) ]
             [ img [ src (Maybe.withDefault "#" (List.head apartment.images)), class "img-fluid product-thumbnail" ] []
             , h3 [ class "product-title" ] [ text apartment.name ]
-            , strong [ class "product-price" ] [ text <| String.fromFloat apartment.rate ]
-            , span [ class "icon-cross" ] [ img [ src "/img/cross.svg", class "img-fluid" ] [] ]
             ]
         ]

@@ -6,6 +6,7 @@ import Page exposing (Page)
 import Components.Header
 import Components.Hero
 import Components.Listing
+import Components.Amenities
 import Misc.View exposing (toUnstyledView)
 import Misc.Http exposing (Data(..), HttpError)
 import Api.ApartmentData exposing (Apartment, listApartments)
@@ -73,10 +74,17 @@ view model =
             let
                 innerView =
                     Components.Listing.view <|
-                        { title = "Home"
-                        , apartments = model.apartments
-                        , body = []
-                        }
+                        let
+                            amenitiesView =
+                                Components.Amenities.view <|
+                                    { title = "Home"
+                                    , body = []
+                                    }
+                        in
+                            { title = amenitiesView.title
+                            , apartments = model.apartments
+                            , body = amenitiesView.body
+                            }
             in
                 { title = innerView.title
                 , apartment = Nothing

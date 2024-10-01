@@ -2,7 +2,6 @@ module Misc.Http exposing (..)
 
 import Http exposing (Expect, expectStringResponse)
 import Json.Decode as Decode
-import Dict
 
 type HttpError
     = BadUrl String
@@ -25,8 +24,13 @@ expectJson toMsg decoder =
         Http.NetworkError_ ->
           Err NetworkError
 
-        Http.BadStatus_ metadata _ ->
-          Err (BadStatus metadata.statusCode (Dict.get "message" metadata.headers))
+        Http.BadStatus_ _ body ->
+            case Decode.decodeString decoder body of
+                Ok value ->
+                    Ok value
+
+                Err err ->
+                    Err (BadBody (Decode.errorToString err))
 
         Http.GoodStatus_ _ body ->
           case Decode.decodeString decoder body of
@@ -64,4 +68,4 @@ toUserFriendlyMessage httpError =
 type Data value
     = Loading
     | Success value
-    | Failure Http.Error
+    | Failure HttpError

@@ -2,7 +2,7 @@ module Pages.Apartments.Apartmentid_ exposing (Model, Msg, page)
 
 
 import Html.Styled exposing (..)
-import View as V
+import View
 import Page exposing (Page)
 import Components.Header
 import Components.Hero
@@ -67,7 +67,7 @@ subscriptions _ =
 -- VIEW
 
 
-view : { apartmentid : String } -> Model -> V.View Msg
+view : { apartmentid : String } -> Model -> View.View Msg
 view params model =
     toUnstyledView <|
         Components.Header.view <|
