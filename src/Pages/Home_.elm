@@ -11,11 +11,14 @@ import Components.AboutBella
 import Misc.View exposing (toUnstyledView)
 import Misc.Http exposing (Data(..), HttpError)
 import Api.ApartmentData exposing (Apartment, listApartments)
+import Shared
+import Route exposing (Route)
+import Effect exposing (Effect, sendCmd)
 
-page : Page Model Msg
-page =
-    Page.element
-        { init = init
+page : Shared.Model -> Route () -> Page Model Msg
+page shared _ =
+    Page.new
+        { init = init shared
         , update = update
         , subscriptions = subscriptions
         , view = view
@@ -28,10 +31,10 @@ type alias Model =
     { apartments : Data (List Apartment)
     }
 
-init : ( Model, Cmd Msg )
-init =
+init : Shared.Model -> () -> ( Model, Effect Msg )
+init shared _ =
     ( { apartments = Loading }
-    , listApartments
+    , sendCmd <| listApartments shared
         { onResponse = ApartmentApiResponded
         }
     )
@@ -44,16 +47,16 @@ type Msg
     = ApartmentApiResponded (Result HttpError (List Apartment))
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Effect Msg )
 update msg model =
     case msg of
         ApartmentApiResponded (Ok data) ->
             ( { model | apartments = Success data }
-            , Cmd.none
+            , Effect.none
             )
         ApartmentApiResponded (Err _) ->
             ( model
-            , Cmd.none
+            , Effect.none
             )
 
 

@@ -13,16 +13,19 @@ import Time exposing (Month(..))
 import Date exposing (Date, fromCalendarDate, today, fromIsoString)
 import Task exposing (perform)
 import Toast exposing (Tray, render, add, expireOnBlur, tray, config)
+import Shared
+import Route exposing (Route)
+import Effect exposing (Effect, sendCmd)
 
 type alias Msg = Components.Booking.Msg
 
-page : {apartmentid : String} -> Page Model Msg
-page params =
-    Page.element
-        { init = init params.apartmentid
-        , update = update
+page : Shared.Model -> Route ({apartmentid : String})  -> Page Model Msg
+page shared route =
+    Page.new
+        { init = init route.params.apartmentid shared
+        , update = update shared
         , subscriptions = subscriptions
-        , view = view params
+        , view = view route.params
         }
 
 
@@ -38,8 +41,8 @@ type alias Model =
     }
 
 
-init : String -> (Model, Cmd Msg)
-init apartmentid =
+init : String -> Shared.Model -> () -> (Model, Effect Msg)
+init apartmentid shared _ =
     ({
       apartment = Loading
     , booking = defaultBooking apartmentid (fromCalendarDate 1970 Jan 1)
@@ -47,8 +50,8 @@ init apartmentid =
     , price = Loading
     , tray = tray
     }
-    ,  Cmd.batch 
-        [ getApartment apartmentid
+    ,  sendCmd <| Cmd.batch 
+        [ getApartment shared apartmentid
             { onResponse = ApartmentApiResponded
             }
         , today |> perform GetToday
@@ -73,8 +76,8 @@ defaultBooking apartmentid defaultDate =
 
 -- UPDATE
 
-update : Msg -> Model -> (Model, Cmd Msg)
-update msg model =
+update : Shared.Model -> Msg -> Model -> (Model, Effect Msg)
+update shared msg model =
     case msg of
         UpdateForm field input ->
             let
@@ -83,19 +86,19 @@ update msg model =
             in
                 case field of
                     Fname ->
-                        ({ model | booking = { booking | fname = input } }, Cmd.none)
+                        ({ model | booking = { booking | fname = input } }, Effect.none)
                     Lname ->
-                        ({ model | booking = { booking | lname = input } }, Cmd.none)
+                        ({ model | booking = { booking | lname = input } }, Effect.none)
                     Email ->
-                        ({ model | booking = { booking | email = input } }, Cmd.none)
+                        ({ model | booking = { booking | email = input } }, Effect.none)
                     Phone ->
-                        ({ model | booking = { booking | phone = input } }, Cmd.none)
+                        ({ model | booking = { booking | phone = input } }, Effect.none)
                     ID ->
-                        ({ model | booking = { booking | idtype = fromRepr input } }, Cmd.none)
+                        ({ model | booking = { booking | idtype = fromRepr input } }, Effect.none)
                     IDExp ->
-                        ({ model | booking = { booking | idexp = Maybe.withDefault model.booking.idexp (Result.toMaybe (fromIsoString input)) } }, Cmd.none)
+                        ({ model | booking = { booking | idexp = Maybe.withDefault model.booking.idexp (Result.toMaybe (fromIsoString input)) } }, Effect.none)
                     IDNumber ->
-                        ({ model | booking = { booking | idnumber = input } }, Cmd.none)
+                        ({ model | booking = { booking | idnumber = input } }, Effect.none)
                     StartDate ->
                         let
                             start_date = Maybe.withDefault model.booking.range.check_in (Result.toMaybe (fromIsoString input))
@@ -103,7 +106,7 @@ update msg model =
                             updated_booking = { booking | range = { range | check_in = start_date, check_out = end_date } }
                         in
                             ({ model | booking = updated_booking },
-                            getPrice {
+                            sendCmd <| getPrice shared {
                                 onResponse = PriceApiResponded
                                 , apartmentid = updated_booking.apartment_id
                                 , range = updated_booking.range
@@ -115,14 +118,14 @@ update msg model =
                             updated_booking = { booking | range = { range | check_in = start_date, check_out = Date.max end_date (Date.add Date.Days 1 start_date) } }
                         in
                             ({ model | booking = updated_booking }, 
-                            getPrice {
+                            sendCmd <| getPrice shared {
                                 onResponse = PriceApiResponded
                                 , apartmentid = updated_booking.apartment_id
                                 , range = updated_booking.range
                             })
         Book ->
             (model
-            , createBooking {
+            , sendCmd <| createBooking shared {
                 onResponse = BookingApiResponded
                 ,  booking = model.booking
             })
@@ -133,31 +136,31 @@ update msg model =
                 -- booking = if resp.success then defaultBooking model.booking.apartment_id model.booking.range.check_in else model.booking
                 booking = model.booking
             in
-                ({ model | tray = tray, booking = booking }, Cmd.map ToastMsg mesg)
+                ({ model | tray = tray, booking = booking }, sendCmd <| Cmd.map ToastMsg mesg)
         BookingApiResponded (Err err) ->
             let
                 notification = { type_ = ERROR, message = toUserFriendlyMessage err }
                 ( tray, mesg ) = add model.tray (expireOnBlur 5000 notification)
             in
-                ({ model | tray = tray }, Cmd.map ToastMsg mesg)
+                ({ model | tray = tray }, sendCmd <| Cmd.map ToastMsg mesg)
         ApartmentApiResponded (Ok data) ->
             ( { model | apartment = Success data }
-            , getPrice {
+            , sendCmd <| getPrice shared {
                 onResponse = PriceApiResponded
                 , apartmentid = data.id
                 , range = model.booking.range
             })
         ApartmentApiResponded (Err err) ->
             ( { model | apartment = Failure err }
-            , Cmd.none
+            , Effect.none
             )
         PriceApiResponded (Ok data) ->
             ( { model | price = Success data }
-            , Cmd.none
+            , Effect.none
             )
         PriceApiResponded (Err _) ->
             ( model
-            , Cmd.none
+            , Effect.none
             )
         GetToday today ->
             let
@@ -165,13 +168,13 @@ update msg model =
                 range = booking.range
             in
                 ( { model | today = today, booking = { booking | range = { range | check_in = today, check_out = Date.add Date.Days 1 today }, idexp = today } }
-                , Cmd.none
+                , Effect.none
                 )
         ToastMsg mesg ->
             let
                 ( tray, newMesg ) = Toast.update mesg model.tray
             in  
-                ({ model | tray = tray }, Cmd.map ToastMsg newMesg)
+                ({ model | tray = tray }, sendCmd <| Cmd.map ToastMsg newMesg)
             
 
 -- SUBSCRIPTIONS

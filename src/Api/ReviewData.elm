@@ -6,14 +6,16 @@ import Json.Decode.Field as Field
 import Date exposing (Date)
 import Time exposing (Month(..))
 import Misc.Http exposing (HttpError, expectJson)
+import Shared
 
-listReviews : String
+listReviews :
+    Shared.Model -> String
     -> { onResponse : Result HttpError (List Review) -> msg
     }
     -> Cmd msg
-listReviews apartmentID options =
+listReviews shared apartmentID options =
     Http.get
-        { url = "http://localhost:55059/api/reviews?apartmentID=" ++ apartmentID
+        { url = shared.url ++ "/api/reviews?apartmentID=" ++ apartmentID
         , expect = expectJson options.onResponse reviewListDecoder
         }
 

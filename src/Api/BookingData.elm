@@ -6,13 +6,15 @@ import Json.Encode as Encode
 import Json.Decode.Field as Field
 import Misc.Http exposing (HttpError, expectJson)
 import Date exposing (Date, toIsoString)
+import Shared
 
 createBooking :
+    Shared.Model ->
     { onResponse : Result HttpError BookingResp -> msg
     , booking : Booking
     }
     -> Cmd msg
-createBooking options =
+createBooking shared options =
     let
         body : Encode.Value
         body =
@@ -33,7 +35,7 @@ createBooking options =
         cmd : Cmd msg
         cmd =
             Http.post
-                { url = "http://localhost:55059/api/bookings"
+                { url = shared.url ++ "/api/bookings"
                 , body = Http.jsonBody body
                 , expect = expectJson options.onResponse bookingRespDecoder
                 }

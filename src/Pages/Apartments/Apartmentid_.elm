@@ -10,15 +10,17 @@ import Components.Apartment
 import Misc.View exposing (toUnstyledView)
 import Misc.Http exposing (Data(..), HttpError)
 import Api.ApartmentData exposing (Apartment, getApartment)
+import Shared
+import Route exposing (Route)
+import Effect exposing (Effect, sendCmd)
 
-
-page : {apartmentid : String} -> Page Model Msg
-page params =
-    Page.element
-        { init = init params.apartmentid
+page : Shared.Model -> Route ({apartmentid : String}) -> Page Model Msg
+page shared route =
+    Page.new
+        { init = init shared route.params.apartmentid
         , update = update
         , subscriptions = subscriptions
-        , view = view params
+        , view = view route.params
         }
 
 
@@ -30,10 +32,10 @@ type alias Model =
     }
 
 
-init : String -> (Model, Cmd Msg)
-init apartmentid =
+init : Shared.Model -> String -> () -> (Model, Effect Msg)
+init shared apartmentid _ =
     ({ apartment = Loading }
-    , getApartment apartmentid
+    , sendCmd <| getApartment shared apartmentid
         { onResponse = ApartmentApiResponded
         }
     )
@@ -45,16 +47,16 @@ type Msg
     = ApartmentApiResponded (Result HttpError Apartment)
 
 
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> (Model, Effect Msg)
 update msg model =
     case msg of
         ApartmentApiResponded (Ok data) ->
             ( { model | apartment = Success data }
-            , Cmd.none
+            , Effect.none
             )
         ApartmentApiResponded (Err _) ->
             ( model
-            , Cmd.none
+            , Effect.none
             )
 
 -- SUBSCRIPTIONS
