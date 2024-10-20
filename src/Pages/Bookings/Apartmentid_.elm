@@ -99,7 +99,7 @@ update msg model =
                     StartDate ->
                         let
                             start_date = Maybe.withDefault model.booking.range.check_in (Result.toMaybe (fromIsoString input))
-                            end_date = Date.max start_date model.booking.range.check_out
+                            end_date = Date.max (Date.add Date.Days 1 start_date) model.booking.range.check_out
                             updated_booking = { booking | range = { range | check_in = start_date, check_out = end_date } }
                         in
                             ({ model | booking = updated_booking },
@@ -112,7 +112,7 @@ update msg model =
                         let
                             end_date = Maybe.withDefault model.booking.range.check_out (Result.toMaybe (fromIsoString input))
                             start_date = Date.min end_date model.booking.range.check_in
-                            updated_booking = { booking | range = { range | check_in = start_date, check_out = end_date } }
+                            updated_booking = { booking | range = { range | check_in = start_date, check_out = Date.max end_date (Date.add Date.Days 1 start_date) } }
                         in
                             ({ model | booking = updated_booking }, 
                             getPrice {
@@ -164,7 +164,7 @@ update msg model =
                 booking = model.booking
                 range = booking.range
             in
-                ( { model | today = today, booking = { booking | range = { range | check_in = today, check_out = today }, idexp = today } }
+                ( { model | today = today, booking = { booking | range = { range | check_in = today, check_out = Date.add Date.Days 1 today }, idexp = today } }
                 , Cmd.none
                 )
         ToastMsg mesg ->

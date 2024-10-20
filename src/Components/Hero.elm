@@ -1,6 +1,6 @@
 module Components.Hero exposing (..)
 
-import Html.Styled exposing (Html, div, text, a, img, h1, p, span, br)
+import Html.Styled exposing (Html, div, text, a, img, h1, p, span, br, strong)
 import Html.Styled.Attributes exposing (class, href, src)
 import Misc.View exposing (StyledView)
 
@@ -19,7 +19,7 @@ view props =
                 [ div [ class "col-lg-5" ]
                     [ div [ class "intro-excerpt" ]
                         [ h1 [] [ br[][], span [ class "d-block" ] [ text (if List.member props.title ["Home", "Booking", "Contact"] then "Bella Shortlet Apartments" else props.title) ] ]
-                        , p [ class "mb-4" ] [ text "Shortlets available for rent" ]
+                        , p [ class "mb-4" ] [ strong [] [text "Shortlets available for rent...Experience the art of comfortable and luxury living away from home"] ]
                         , if (props.title /= "Home" ) then p [] [ a [ href <| getButtonHref props.apartment, class "btn btn-secondary me-2" ] [ text "Book Now" ] ] else span [] []
                         ]
                     ]

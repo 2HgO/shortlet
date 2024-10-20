@@ -7,6 +7,7 @@ import Components.Header
 import Components.Hero
 import Components.Listing
 import Components.Amenities
+import Components.AboutBella
 import Misc.View exposing (toUnstyledView)
 import Misc.Http exposing (Data(..), HttpError)
 import Api.ApartmentData exposing (Apartment, listApartments)
@@ -77,9 +78,10 @@ view model =
                         let
                             amenitiesView =
                                 Components.Amenities.view <|
-                                    { title = "Home"
-                                    , body = []
-                                    }
+                                    Components.AboutBella.view <|
+                                        { title = "Home"
+                                        , body = []
+                                        }
                         in
                             { title = amenitiesView.title
                             , apartments = model.apartments
