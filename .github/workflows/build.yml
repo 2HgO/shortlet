@@ -1,7 +1,12 @@
-name: my-workflow
+name: Build App
+
+on:
+  push:
+    branches: ["main"]
+
 jobs:
-  my-job:
-    name: my-job
+  build-app:
+    name: build-app
     runs-on: ubuntu-latest
     steps:
       # ...
