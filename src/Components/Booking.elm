@@ -28,6 +28,7 @@ type Msg
     | BookingApiResponded (Result HttpError BookingResp)
     | UpdateForm FormField String
     | ApartmentApiResponded (Result HttpError Apartment)
+    | ApartmentsApiResponded (Result HttpError (List Apartment))
     | GetToday Date
     | PriceApiResponded (Result HttpError Price)
     | ToastMsg Toast.Msg
@@ -173,7 +174,7 @@ view props =
                                             ]
                                         ]
                                     ]
-                                , button [type_ "button", class "btn btn-primary-hover-outline", onClick Book] [ text "Confirm Booking" ]
+                                , div[ class "row justify-content-center" ] [button [type_ "button", class "btn btn-primary-hover-outline col-4", onClick Book] [ text "Confirm Booking" ]]
                                 ]
                             ]
                         ]

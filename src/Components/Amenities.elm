@@ -80,7 +80,7 @@ view props =
                             [ div [ class "feature" ]
                                 [ div [ class "icon" ]
                                     [ img [ src "img/washer.svg", alt "Image", class "imf-fluid" ] [] ]
-                                , h3 [] [ text "Washer and Dryer Units" ], p [] [ text "Washing Machine. For your convenience, washing machine is available to take care of your washing needs." ]
+                                , h3 [] [ text "Washing Mashine" ], p [] [ text "Washing Machine. For your convenience, washing machine is available to take care of your washing needs." ]
                                 ]
                             ]
                     , div [ class "col-3 col-md-3 mb-5" ]

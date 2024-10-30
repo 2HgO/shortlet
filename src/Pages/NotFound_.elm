@@ -5,6 +5,7 @@ import Html.Styled exposing (..)
 import Page exposing (Page)
 import Route exposing (Route)
 import Components.Header
+import Components.Footer
 import Misc.View exposing (toUnstyledView)
 import Shared
 import View exposing (View)
@@ -12,6 +13,7 @@ import Css exposing (center, px)
 import Html.Styled.Attributes exposing (css)
 import Css exposing (textAlign)
 import Css exposing (padding)
+import Misc.Http exposing (Data(..))
 
 
 page : Shared.Model -> Route () -> Page Model Msg
@@ -73,6 +75,13 @@ view : Model -> View Msg
 view _ =
     toUnstyledView <|
         Components.Header.view <|
-            { title = "Not Found"
-            , body = [ div [ css [ textAlign center, padding (px 30) ] ] [ h4 [] [ text "Page not found" ] ] ]
-            }
+            let
+                footerView = Components.Footer.view <|
+                    { title = "Home"
+                    , body = []
+                    }
+            in
+                { title = "Not Found"
+                , body = List.append [ div [ css [ textAlign center, padding (px 30) ] ] [ h4 [] [ text "Page not found" ] ] ] footerView.body
+                , apartments = Loading
+                }

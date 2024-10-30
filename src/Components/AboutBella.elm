@@ -25,7 +25,7 @@ view props =
                         [ div [ class "testimonial-block text-center" ]
                             [ blockquote [ class "mb-5" ]
                                 [ text """
-                                    Bella Shortlet Apartments is located in a serene and gated location Ikate in Lekki Phase 1 area of Lagos. It’s within a walking distance from Nike Art Gallery and about 8 km from Lekki Conservation Centre.
+                                    Bella Shortlet Apartments is located in a serene and gated location in Ikate Lekki Phase 1 area of Lagos. It’s within a walking distance from Nike Art Gallery and about 8 km from Lekki Conservation Centre.
 
                                     The units are equipped with air conditioning, a flat-screen TV with streaming services, a coffee machine, a shower and a desk. All units come with a kettle, a private bathroom and free WiFi, while selected rooms are fitted with a terrace and some have city views. At the apartment complex, every unit is equipped with bed linen and towels.
 

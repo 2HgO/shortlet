@@ -7,6 +7,7 @@ import Components.Header
 import Components.Hero
 import Components.Listing
 import Components.Amenities
+import Components.Footer
 import Components.AboutBella
 import Misc.View exposing (toUnstyledView)
 import Misc.Http exposing (Data(..), HttpError)
@@ -74,24 +75,31 @@ view : Model -> V.View Msg
 view model =
     toUnstyledView <|
     Components.Header.view <|
-        Components.Hero.view <|
-            let
-                innerView =
-                    Components.Listing.view <|
-                        let
-                            amenitiesView =
-                                Components.Amenities.view <|
-                                    Components.AboutBella.view <|
-                                        { title = "Home"
-                                        , body = []
-                                        }
-                        in
-                            { title = amenitiesView.title
-                            , apartments = model.apartments
-                            , body = amenitiesView.body
-                            }
+        let
+            heroView = Components.Hero.view <|
+                let
+                    innerView =
+                        Components.Listing.view <|
+                            let
+                                amenitiesView =
+                                    Components.Amenities.view <|
+                                        Components.AboutBella.view <|
+                                            Components.Footer.view <|
+                                                { title = "Home"
+                                                , body = []
+                                                }
+                            in
+                                { title = amenitiesView.title
+                                , apartments = model.apartments
+                                , body = amenitiesView.body
+                                }
+                in
+                    { title = innerView.title
+                    , apartment = Loading
+                    , body = innerView.body
+                    }
             in
-                { title = innerView.title
-                , apartment = Nothing
-                , body = innerView.body
+                { title = heroView.title
+                , apartments = model.apartments
+                , body = heroView.body
                 }

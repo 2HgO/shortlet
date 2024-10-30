@@ -52,7 +52,7 @@ viewApartment data =
                 div [ class "row justify-content-center" ]
                     [ div [ class "col-md-8 col-lg-8 pb-4" ]
                         [ div [ class "row mb-5" ]
-                            [ label "/img/rate.svg" ("₦" ++ format usLocale apartment.rate)
+                            [ label "/img/money-svg.svg" ("₦" ++ format usLocale apartment.rate)
                             ]
                         ]
                     ]
@@ -69,7 +69,7 @@ label svgPath value =
             [ div [class "service-icon color-1 mb-4"]
                 [ span [] [ img [src svgPath, class "img-fluid" ] [] ]
                 ]
-            , div [class "service-contents"][ p [] [ text value ] ]
+            , div [class "service-contents"][ p [] [ text <| value ++ "/night" ] ]
             ]
         ]
 

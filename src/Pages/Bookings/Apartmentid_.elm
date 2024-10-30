@@ -4,6 +4,9 @@ import Html.Styled exposing (..)
 import View
 import Page exposing (Page)
 import Components.Header exposing (view)
+import Components.Hero exposing (view)
+import Components.Policies exposing (view)
+import Components.Footer
 import Components.Booking exposing (Msg(..), FormField(..), Notification, NotificationType(..), viewToast)
 import Misc.View exposing (toUnstyledView)
 import Misc.Http exposing (Data(..), toUserFriendlyMessage)
@@ -16,6 +19,7 @@ import Toast exposing (Tray, render, add, expireOnBlur, tray, config)
 import Shared
 import Route exposing (Route)
 import Effect exposing (Effect, sendCmd)
+import Api.ApartmentData exposing (listApartments)
 
 type alias Msg = Components.Booking.Msg
 
@@ -38,6 +42,7 @@ type alias Model =
     , today : Date
     , price : Data Price
     , tray : Tray Notification
+    , apartments : Data (List Apartment)
     }
 
 
@@ -49,12 +54,16 @@ init apartmentid shared _ =
     , today = fromCalendarDate 1970 Jan 1
     , price = Loading
     , tray = tray
+    , apartments = Loading
     }
     ,  sendCmd <| Cmd.batch 
         [ getApartment shared apartmentid
             { onResponse = ApartmentApiResponded
             }
         , today |> perform GetToday
+        , listApartments shared
+            { onResponse = ApartmentsApiResponded
+            }
     ])
 
 
@@ -154,6 +163,13 @@ update shared msg model =
             ( { model | apartment = Failure err }
             , Effect.none
             )
+        ApartmentsApiResponded (Ok data) ->
+            ( { model | apartments = Success data }
+            , Effect.none)
+        ApartmentsApiResponded (Err err) ->
+            ( { model | apartment = Failure err }
+            , Effect.none
+            )
         PriceApiResponded (Ok data) ->
             ( { model | price = Success data }
             , Effect.none
@@ -192,16 +208,31 @@ view _ model =
     toUnstyledView <|
         Components.Header.view <|
             let
-                innerView =
-                    Components.Booking.view
-                        { title = "Booking"
+                heroView = Components.Hero.view <|
+                    let
+                        innerView =
+                            Components.Booking.view <|
+                                let
+                                    policyView = Components.Policies.view <|
+                                        Components.Footer.view <|
+                                            { title = ""
+                                            , body = []
+                                            }
+                                in
+                                { title = "Booking"
+                                , apartment = model.apartment
+                                , booking = model.booking
+                                , price = model.price
+                                , today = model.today
+                                , body = policyView.body
+                                }
+                    in
+                        { title = innerView.title
+                        , body = fromUnstyled (render viewToast model.tray (config ToastMsg)) :: innerView.body
                         , apartment = model.apartment
-                        , booking = model.booking
-                        , price = model.price
-                        , today = model.today
-                        , body = [ ]
                         }
             in
-                { title = innerView.title
-                , body = fromUnstyled (render viewToast model.tray (config ToastMsg)) :: innerView.body
+                { title = heroView.title
+                , body = heroView.body
+                , apartments = model.apartments
                 }
