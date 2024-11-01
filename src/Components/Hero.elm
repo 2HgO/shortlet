@@ -26,7 +26,7 @@ view props =
                         ]
                     ]
                 , div [ class "col-lg-7" ]
-                    [ div [ class "hero-img-wrap" ] [ img [ src <| viewApartmentHeroImage "/img/bella-loft-hero.jpg" props.apartment, class "img-fluid" ] [] ]
+                    [ div [ class "float-right" ] [ img [ src <| viewApartmentHeroImage "/img/bella-loft-hero.jpg" props.apartment, class "img-fluid" ] [] ]
                     ]
                 ]
             
