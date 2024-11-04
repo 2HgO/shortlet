@@ -7,6 +7,7 @@ import Api.ApartmentData exposing (Apartment)
 import Misc.Http exposing (Data(..))
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
+import String exposing (fromInt)
 
 view :
     { title : String
@@ -52,7 +53,10 @@ viewApartment data =
                 div [ class "row justify-content-center" ]
                     [ div [ class "col-md-8 col-lg-8 pb-4" ]
                         [ div [ class "row mb-5" ]
-                            [ label "/img/money-svg.svg" ("₦" ++ format usLocale apartment.rate)
+                            -- [ label "/img/money-svg.svg" ("₦" ++ format usLocale apartment.rate ++ "/night")
+                            [ label "/img/money-bag.svg" ("₦" ++ format usLocale apartment.rate ++ "/night")
+                            , label "/img/door.svg" apartment.description
+                            , label "/img/occupancy.svg" <| fromInt apartment.occupancy ++ " Guests"
                             ]
                         ]
                     ]
@@ -69,7 +73,7 @@ label svgPath value =
             [ div [class "service-icon color-1 mb-4"]
                 [ span [] [ img [src svgPath, class "img-fluid" ] [] ]
                 ]
-            , div [class "service-contents"][ p [] [ text <| value ++ "/night" ] ]
+            , div [class "service-contents"][ p [] [ text <| value ] ]
             ]
         ]
 

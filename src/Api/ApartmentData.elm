@@ -62,6 +62,8 @@ type alias Apartment =
     , name : String
     , images : List String
     , rate : Float
+    , description : String
+    , occupancy : Int
     }
 
 type alias Price =
@@ -73,11 +75,15 @@ apartmentDecoder =
     Field.require "name" Decode.string <| \name ->
     Field.require "images" (Decode.list Decode.string) <| \images ->
     Field.require "rate" Decode.float <| \rate ->
+    Field.require "occupancy" Decode.int <| \occupancy ->
+    Field.require "description" Decode.string <| \description ->
     Decode.succeed
         { id = id
         , name = name
         , images = images
         , rate = rate
+        , description = description
+        , occupancy = occupancy
         }
 
 apartmentListDecoder : Decoder (List Apartment)

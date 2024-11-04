@@ -20,7 +20,7 @@ view props =
             [ div [ class "row justify-content-between" ]
                 [ div [ class "col-lg-5" ]
                     [ div [ class "intro-excerpt" ]
-                        [ h1 [] [ br[][], span [ class "d-block" ] [ text (if List.member props.title ["Home", "Booking", "Contact"] then "Bella Shortlet Apartments" else props.title) ] ]
+                        [ h1 [] [ br[][], span [ class "d-block" ] [ text (if List.member props.title ["Home", "Booking", "Contact"] then "Shortlet Apartments" else props.title) ] ]
                         , p [ class "mb-4" ] [ strong [] [text "Shortlets available for rent...Experience the art of comfortable and luxury living away from home"] ]
                         , if (props.title /= "Home" && (String.contains "Booking for" props.title /= True)) then p [] [ a [ href ("/bookings" ++ (getApartmentName props.apartment)), class "btn btn-secondary me-2" ] [ text "Book Now" ] ] else span [] []
                         ]

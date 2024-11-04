@@ -25,7 +25,7 @@ view props =
                     , div [class "col-lg-6 text-center text-lg-end"]
                         [ ul [class "list-unstyled d-inline-flex ms-auto custom-social"]
                             [ li [] [ a[href "https://instagram.com/Bella_Apartments_2019"] [span [class "fa fa-brands fa-instagram"] [] ]]
-                            , li [] [ a[href "mailto:bellacondoapartments@gmail.com?subject=Guest%20Enquiry"] [span [class "fa fa-paper-plane"] [] ]]
+                            , li [] [ a[href "mailto:bookings@lekkiphaseoneshortlets.com?subject=Guest%20Enquiry"] [span [class "fa fa-paper-plane"] [] ]]
                             , li [] [ a[href "tel:+2348034020553"] [span [class "fa fa-phone"] [] ]]
                             -- li [] [ a[href "https://x.com/"] [span [class "fa fa-brands fa-twitter"] [] ]]
                             ]

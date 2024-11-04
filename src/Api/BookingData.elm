@@ -65,6 +65,7 @@ type IDType
     | License
     | VotersCard
     | Passport
+    | None
 
 toString : IDType -> String
 toString type_ =
@@ -73,6 +74,7 @@ toString type_ =
     License -> "Driver's License"
     Passport -> "International Passport"
     VotersCard -> "Voter's Card"
+    None -> "Pick Identification Type"
 
 toRepr : IDType -> String
 toRepr type_ =
@@ -81,6 +83,7 @@ toRepr type_ =
     License -> "License"
     VotersCard -> "VotersCard"
     Passport -> "Passport"
+    None -> ""
 fromRepr : String -> IDType
 fromRepr type_ =
     case type_ of
@@ -88,7 +91,7 @@ fromRepr type_ =
     "License" -> License
     "VotersCard" -> VotersCard
     "Passport" -> Passport
-    _ -> NIN
+    _ -> None
 
 type alias DateRange =
     { check_in : Date

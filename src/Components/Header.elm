@@ -18,7 +18,7 @@ view props =
     , body =
         nav [ class "custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark", attribute "arial-label" "BELLA navigation bar" ]
             [ div [ class "container" ]
-                [ a [ class "navbar-brand", href "/" ] [ text "BELLA APARTMENTS", span [] [ text "." ] ]
+                [ a [ class "navbar-brand", href "/" ] [ text "LEKKI PHASE ONE SHORTLETS", span [] [ text "." ] ]
                 -- , button [ class "navbar-toggle", type_ "button", attribute "data-bs-toggle" "collapse", attribute "data-bs-target" "#navbarsFurni", attribute "aria-controls" "navbarsFurni", attribute "aria-expanded" "false", attribute "aria-label" "Toggle navigation" ] [ span [ class "navbar-toggler-icon" ] [] ]
                 , div [ class "collapse navbar-collapse" ]
                     [ ul [ class "custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0" ] <|
